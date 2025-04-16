@@ -18,7 +18,7 @@ int main()
 /*
 #include <stdio.h>
 
-int StrCmp_OwnImple(char str1[], char str2[]) 
+int strcmp_array(char str1[], char str2[]) 
 {
     	int i = 0;
     	while ((str1[i] != '\0') && (str2[i] != '\0') && (str1[i] == str2[i])) 
@@ -35,7 +35,7 @@ int main()
 {
     	char str[]="Dineshk";
 	char ch[20]={'D','i','n','e','s','h','\0'};
-    	int result = StrCmp_OwnImple(str, ch);
+    	int result = strcmp_array(str, ch);
    	if (result == 0)
         	printf("Strings are equal.\n");
     	else
@@ -46,7 +46,7 @@ int main()
 
 #include <stdio.h>
 
-int StrCmp_PointerVersion(char *str1, char *str2)  
+int strcmp_pointer(char *str1, char *str2)  
 {
     	while (*str1 && *str2 && (*str1 == *str2)) 
     	{
@@ -61,7 +61,7 @@ int main()
 	char str[]="Dinesh";
 	char ch[20]={'D','i','n','e','s','h','\0'};
 
-    	int result = StrCmp_PointerVersion(str,ch);
+    	int result = strcmp_pointer(str,ch);
 
     	if (result == 0)
         	printf("Strings are equal\n");
