@@ -1,0 +1,7 @@
+gcc -Wall main.c -o output	-Wall		-give the suggestion any wrong 
+
+gcc -Wall -Wextra main.c -o output	-Wall -Wextra	- give extra warning that missed in -Wall
+
+gcc -Wall -Wextra -Werror main.c -o output	-Werror	- this make the warning to error
+
+
