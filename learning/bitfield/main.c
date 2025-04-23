@@ -33,17 +33,20 @@ int main()
 #include<stdio.h>
 struct test
 {
-	unsigned int x;
-	long int y:33;
-	unsigned int z;
+	//unsigned int x;
+	//long int y:33;
+	//unsigned int z;
 	
-
+	int a;
+	int *u;	
+	//char d;
+	int c;
 };
 
 int main()
 {
 	struct test t;
 	printf("size of test is %lu \n",sizeof(struct test));
-	//printf("size of test is %lu \n",sizeof(t.b));
+	//printf("size of test is %lu \n",sizeof(t.));
 }
 
