@@ -120,22 +120,101 @@ a1.o a2.o:
 	echo $@
 	
 #static Patterns
-all3: foo.o bar.o
+all3: s1.o s2.o
 .PHONY: all3
 
-# The automatic variable $@ matches the target, and $< matches the prerequisite
-foo.o: foo.c
+# The automatic variable $@ matches the target(s1.0), and $< matches the prerequisite(s1.c)
+s1.o: s1.c
 	echo "Call gcc to generate $@ from $<"
 
-bar.o: bar.c
-	echo "Call gcc to generate bar.o from bar.c"
+s2.o: s2.c
+	echo "Call gcc to generate s2.o from s2.c"
 
-# Matches all .c files and creates them if they don't exist
-%.c:
+# Matches all .c files and creates them if they don't exist // // "uncomment to use next line"
+#%.c: ; touch $@
+
+clean_static:
+	rm -f s1.c s2.c
+	
+#static2
+# This Makefile uses less hard coded rules, via static pattern rules
+objects = s3.o s4.o
+all4: $(objects)
+.PHONY: all4
+
+# In the case of the first target, foo.o, the target-pattern matches foo.o and sets the "stem" to be "foo".
+#   It then replaces that stem with the wilecard pattern in prereq-patterns
+$(objects): %.o: %.c
+	echo "Call gcc to generate $@ from $<"
+
+#%.c: ; touch $@   // this line previous made so now it global if any .c detected it will create
+
+clean_static2:
+	rm -f s4.c s3.c
+
+
+##Static Pattern Rules and Filter
+obj_files = foo.result bar.o lose.o
+src_files = foo.raw bar.c lose.c
+
+all5: $(obj_files)
+.PHONY: all5
+
+$(filter %.o,$(obj_files)): %.o: %.c
+	echo "target: $@ prereq: $<"
+$(filter %.result,$(obj_files)): %.result: %.raw
+	echo "target: $@ prereq: $<"
+
+%.c %.raw:
 	touch $@
 
-clean:
-	rm -f foo.c bar.c
+clean_staticfilter:
+	rm -f $(src_files)
 	
+	
+#double colon rule where u can create target two times	
+dcolon: danger
 
+danger:: ; @echo "hello"
+danger:: ; @echo "hello again"
+
+# Command Echoing/Silencing 
+# or make -s cmd run i terminal
+echo:
+	@echo "This make line will not be printed"
+	echo "But this will"
+
+#Command Execution
+cmd_execution:
+	cd ..
+	# The cd above does not affect this line, because each command is effectively run in a new shell
+	echo `pwd`
+
+	# This cd command affects the next because they are on the same line
+	cd ..;echo `pwd`
+
+	# Same as above
+	cd ..; \
+	echo `pwd`
+
+
+#Default Shell (Section 5.2)
+The default shell is /bin/sh. You can change this by changing the variable SHELL:
+
+SHELL=/bin/bash
+
+cool:
+	echo "Hello from bash"
+
+#DELETE_ON_ERROR 
+.DELETE_ON_ERROR:
+all: one two
+
+one:
+	touch one
+	false
+
+two:
+	touch two
+	false
 
