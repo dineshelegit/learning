@@ -1,12 +1,15 @@
 gcc -E padding.c -o output.i	-E(stop after preprocessing)	-- preprocessed file (.i)  
 gcc -S padding.c -o output.s	-S(stop after assembly code)	-- assembly code (.s)
 gcc -c padding.c -o output.o	-c(stop after compliling to obiject code(no linking))
-objdump -d output.o 		-view inside like cat cmd
+objdump -d output.o 		-view assembly instruction
+objdump -x output.o		- view section,headers,symbols
+file output.o			- basic file formate
+nm output.o			- list function, variable
+hexdump -C filename.o		- raw bytes (hex + ASCII)
 
 gcc padding.c -o output 	- executable file
 file output			- shows file type
 ldd output			- list library
-objdump -d output		- Display assembly code of the executable
 ./output			- run the executable code
 
 

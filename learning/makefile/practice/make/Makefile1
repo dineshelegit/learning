@@ -1,0 +1,373 @@
+#.PHONY: all dinesh 
+
+#//main: -target $(name) -variable
+
+#all: dinesh main
+
+dinesh:
+	@echo "DINESHKUMAR"
+
+main: main.o c1.o c2.o c3.o
+	gcc main.o c1.o c2.o c3.o -o main
+
+main.o: main.c h1.h h2.h h3.h
+	gcc -c main.c -o main.o
+
+c1.o: c1.c h1.h
+	gcc -c c1.c -o c1.o
+
+c2.o: c2.c h2.h
+	gcc -c c2.c -o c2.o
+
+c3.o: c3.c h3.h
+	gcc -c c3.c -o c3.o
+	
+clean:
+	@rm -f main.o c1.o c2.o c3.o main
+
+#different ver to print
+some_file:
+	@echo "This line will always print"
+	@echo "This line too long, so " \
+	      "reverse slash used to continue to the next line"	
+	#touch some_file
+#	@echo "This line too long,so " \ #IF ANY SPACE AFTER LASH IT SYSNTAX ERROR
+#		"reverse lash used to use next line in 1 line"      
+
+some_file1: ;	touch some_file1
+
+
+#it first it finish other_file then it print some_file
+dependency: other_file
+	@echo "This will run secound"
+	touch some_file
+	
+other_file:
+	@echo "This run first"
+	touch some_file1
+
+.PHONY: clean
+	
+clean_dependency:
+	@rm some_file some_file1 clean	
+
+#variable 
+files = file1 file2
+variable: $(files)
+	@echo "Look at this variable" $(files)
+	touch clean
+
+file1: ; touch some_file
+
+file2: ; touch some_file1
+
+
+implicit_error:
+	#this cause error when target is empty
+	
+# Wildcard -> *,?,[...]
+#* files found in c	
+# for variable declaration or function argument 
+# := $(wildcard *.c) syntax ":=" must 
+wring=*.o # not valid
+object := $(wildcard *.c) 
+wild1: 
+	@echo "c files found:" $(wildcard *.c)
+	@echo "c files found using variable:" $(object) 
+	@echo "Not valid not printing" $(wrong) 
+
+
+#include path 
+root := /home/dklive7755/cprogram/learning/makefile/practice/make
+SRC := $(root)/src
+HEADER := $(root)/header
+wfiles := $(wildcard $(SRC)/*.c)
+vpath %.h $(HEADER)
+
+path:
+	@echo "create folders"
+	mkdir $(SRC)
+	mkdir $(HEADER)	
+	@echo "create files"
+	touch $(SRC)/f1.c
+	touch $(HEADER)/f1.h
+	@echo ".C files: $(wildcard $(SRC)/*.c)"
+	@echo ".H files: $(wildcard $(HEADER)/*.h)"
+
+.PHONY: clean_path
+
+clean_path:
+	@rm -rf $(HEADER)
+	@rm -rf $(SRC)
+	
+	
+#Target
+all1: one two three
+.PHONY: all1
+
+one: ; touch one
+
+two: ; touch two
+
+three: ; touch three
+
+clean_target: ; rm -f one two three
+
+#multiple target
+all2: a1.o a2.o
+.PHONY: all2
+a1.o a2.o:
+	echo $@
+	
+#static Patterns
+all3: s1.o s2.o
+.PHONY: all3
+
+# The automatic variable $@ matches the target(s1.0), and $< matches the prerequisite(s1.c)
+s1.o: s1.c
+	echo "Call gcc to generate $@ from $<"
+
+s2.o: s2.c
+	echo "Call gcc to generate s2.o from s2.c"
+
+# Matches all .c files and creates them if they don't exist // // "uncomment to use next line"
+#%.c: ; touch $@
+
+clean_static:
+	rm -f s1.c s2.c
+	
+#static2
+# This Makefile uses less hard coded rules, via static pattern rules
+objects = s3.o s4.o
+all4: $(objects)
+.PHONY: all4
+
+# In the case of the first target, foo.o, the target-pattern matches foo.o and sets the "stem" to be "foo".
+#   It then replaces that stem with the wilecard pattern in prereq-patterns
+$(objects): %.o: %.c
+	echo "Call gcc to generate $@ from $<"
+
+#%.c: ; touch $@   // this line previous made so now it global if any .c detected it will create
+
+clean_static2:
+	rm -f s4.c s3.c
+
+
+##Static Pattern Rules and Filter
+obj_files = foo.result bar.o lose.o
+src_files = foo.raw bar.c lose.c
+
+all5: $(obj_files)
+.PHONY: all5
+
+$(filter %.o,$(obj_files)): %.o: %.c
+	echo "target: $@ prereq: $<"
+$(filter %.result,$(obj_files)): %.result: %.raw
+	echo "target: $@ prereq: $<"
+
+%.c %.raw:
+	touch $@
+
+clean_staticfilter:
+	rm -f $(src_files)
+	
+	
+#double colon rule where u can create target two times	
+dcolon: danger
+
+danger:: ; @echo "hello"
+danger:: ; @echo "hello again"
+
+# Command Echoing/Silencing 
+# or make -s cmd run i terminal
+echo:
+	@echo "This make line will not be printed"
+	echo "But this will"
+
+#Command Execution
+cmd_execution:
+	cd ..
+	# The cd above does not affect this line, because each command is effectively run in a new shell
+	echo `pwd`
+
+	# This cd command affects the next because they are on the same line
+	cd ..;echo `pwd`
+
+	# Same as above
+	cd ..; \
+	echo `pwd`
+
+
+#Default Shell (Section 5.2)
+The default shell is /bin/sh. You can change this by changing the variable SHELL:
+
+SHELL=/bin/bash
+cool:
+	echo "Hello from bash"
+
+
+
+#DELETE_ON_ERROR  remove # for use
+#.DELETE_ON_ERROR:
+delete: one two
+
+one:
+	touch one
+
+#Handling errors with - and -i
+one:
+	# This error will be printed but ignored, and make will continue to run
+	-false
+	touch one
+two:
+	touch two
+	false
+
+#Error handling with -k, -i, and i
+#Add -k when running make to continue running even in the face of errors. Helpful if you want to see all the errors of Make at once. Add a "-" before a command to suppress the error Add "-i" to make to have this happen for every command.
+
+
+
+#Recursive use of make (Section 5.6)
+#Recursively call a makefile. Use the special $(MAKE) instead of "make" because it will pass the make flags for you and won't itself be affected by them.
+
+new_contents = "hello:\n\ttouch inside_file"
+recursive:
+	mkdir -p subdir
+	echo $(new_contents) | sed -e 's/^ //' > subdir/makefile
+	cd subdir && $(make)
+
+clean_recursive:
+	rm -rf subdir
+	
+	
+Use export for recursive make (Section 5.6)
+The export directive takes a variable and makes it accessible to sub-make commands. In this example, "cooly" is exported such that the makefile in subdir can use it.
+
+Note: export has the same syntax as sh, but they aren't related (although similar in function)
+
+new_content1 = "hello:\n\\techo \$$(cooly)"
+
+recursive1:
+	mkdir -p subdir
+	echo $(new_content1) | sed -e 's/^ //' > subdir/makefile
+	@echo "---MAKEFILE CONTENTS---"
+	@cd subdir && cat makefile
+	@echo "---END MAKEFILE CONTENTS---"
+	cd subdir && $(MAKE)
+
+# Note that variables and exports. They are set/affected globally.
+cooly = "The subdirectory can see me!"
+export cooly
+# This would nullify the line above: unexport cooly
+
+clean_recursive1:
+	rm -rf subdir
+	
+
+#Another export example
+#You need to export variables to have them run in the shell as well.
+
+one=this will only work locally
+export two=we can run subcommands with this
+
+.PHONY: export
+export:
+	@echo $(one)
+	@echo $$one
+	@echo $(two)
+	@echo $$two
+	
+#Variables
+#EXPORT_ALL_VARIABLES
+#EXPORT_ALL_VARIABLES does what you might expect
+
+.EXPORT_ALL_VARIABLES:
+new_contents = "hello:\n\techo \$$(cooly)"
+
+cooly = "The subdirectory can see me!"
+# This would nullify the line above: unexport cooly
+
+all:
+	mkdir -p subdir
+	echo $(new_contents) | sed -e 's/^ //' > subdir/makefile
+	@echo "---MAKEFILE CONTENTS---"
+	@cd subdir && cat makefile
+	@echo "---END MAKEFILE CONTENTS---"
+	cd subdir && $(MAKE)
+
+clean:
+	rm -rf subdir
+	
+ariables Reference (Section 6.1)
+Reference variables using ${} or $()
+
+x = dude
+
+.PHONY: all
+all:
+	echo $(x)
+	echo ${x}
+
+	# Bad practice, but works
+	echo $x
+	
+	
+	
+#Variables Types = vs :=
+#Two flavors of variables:
+
+#recursive (use =) - only looks for the variables when the command is used, not when it's defined.
+#simply expanded (use :=) - like normal imperative programming -- only those defined so far get expanded
+# Recursive variable. This will print "later" below
+one = one ${later_variable}
+# Simply expanded variable. This will not print "later" below
+two := two ${later_variable}
+
+later_variable = later
+
+.PHONY: all
+all:
+	echo $(one)
+	echo $(two)
+	
+	
+#Variables Expansion (Section 6.2)
+#Simply expanded allows you to append to a variable. Recursive definitions will give an infinite loop error.
+
+one = hello
+# one gets defined as a simply expanded variable (:=) and thus can handle appending
+one := ${one} there
+
+.PHONY: all
+all:
+	echo $(one)
+	
+#Variables Conditional set with ?=
+#?= only sets variables if they have not yet been set
+
+one = hello
+one ?= will not be set
+two ?= will be set
+
+.PHONY: condition
+condition:
+	echo $(one)
+	echo $(two)
+	
+	
+#Variables: watch out for end-of-line spaces (Section 6.2)
+#Spaces at the end of a line are not stripped, ones at the start are To make a variable with a single space, have a variable guard
+
+with_spaces = hello   # with_spaces has many spaces after "hello"
+after = $(with_spaces)there
+
+nullstring =
+space = $(nullstring) # Make a variable with a single space.
+
+.PHONY: all
+all:
+	echo "$(after)"
+	echo start"$(space)"end	
+
+
