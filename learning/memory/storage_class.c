@@ -29,7 +29,7 @@ int main() {
 */
 
 //static Variable
-
+/*
 #include <stdio.h>
 static int count = 0; // global to this file.c
 void demoStatic() {
@@ -50,4 +50,16 @@ int main() {
     count = 6;
     demoStatic1();
     return 0;
+}xxxxxxxxxxxxxx
+*/
+
+#include <stdio.h>
+
+extern int global; // declaration (no memory allocation)
+extern void showGlobal();
+int main() {
+    printf("Accessing extern global = %d\n", global);
+    showGlobal();
+    return 0;
 }
+

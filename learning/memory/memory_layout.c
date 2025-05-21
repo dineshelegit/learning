@@ -1,17 +1,17 @@
 //Data segment
 //A. BSS uninitialized
 
-/*#include <stdio.h>
+#include <stdio.h>
 int main() 
 {
     return 0;
 }
 
-memory of memory_layout
-   text	   data	    bss	    dec	    hex	filename
-   1228	    544	      8	   1780	    6f4	memory_layout
+//memory of memory_layout
+  // text	   data	    bss	    dec	    hex	filename
+  // 1228	    544	      8	   1780	    6f4	memory_layout
  // bss 8 byte came beacuse of 64byte machine 1 word cycle to cause padding
-*/
+
 /*
 #include <stdio.h>
 
